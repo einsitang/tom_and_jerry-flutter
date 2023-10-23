@@ -1,0 +1,74 @@
+PODS:
+  - AMap3DMap (9.7.0):
+    - AMapFoundation (>= 1.8.0)
+  - amap_flutter_location (0.0.1):
+    - AMapLocation
+    - Flutter
+  - amap_flutter_map (0.0.1):
+    - AMap3DMap
+    - Flutter
+  - AMapFoundation (1.8.2)
+  - AMapLocation (2.10.0):
+    - AMapFoundation (>= 1.8.0)
+  - Flutter (1.0.0)
+  - nim_core (1.4.7):
+    - Flutter
+    - NIMSDK_LITE (~> 9.11.0)
+    - YXAlog
+  - NIMSDK_LITE (9.11.2):
+    - NIMSDK_LITE/NOS (= 9.11.2)
+  - NIMSDK_LITE/NOS (9.11.2)
+  - path_provider_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
+  - yunxin_alog (0.0.1):
+    - Flutter
+    - YXAlog (~> 1.0.7)
+  - YXAlog (1.0.7)
+
+DEPENDENCIES:
+  - amap_flutter_location (from `.symlinks/plugins/amap_flutter_location/ios`)
+  - amap_flutter_map (from `.symlinks/plugins/amap_flutter_map/ios`)
+  - Flutter (from `Flutter`)
+  - nim_core (from `.symlinks/plugins/nim_core/ios`)
+  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
+  - yunxin_alog (from `.symlinks/plugins/yunxin_alog/ios`)
+
+SPEC REPOS:
+  trunk:
+    - AMap3DMap
+    - AMapFoundation
+    - AMapLocation
+    - NIMSDK_LITE
+    - YXAlog
+
+EXTERNAL SOURCES:
+  amap_flutter_location:
+    :path: ".symlinks/plugins/amap_flutter_location/ios"
+  amap_flutter_map:
+    :path: ".symlinks/plugins/amap_flutter_map/ios"
+  Flutter:
+    :path: Flutter
+  nim_core:
+    :path: ".symlinks/plugins/nim_core/ios"
+  path_provider_foundation:
+    :path: ".symlinks/plugins/path_provider_foundation/darwin"
+  yunxin_alog:
+    :path: ".symlinks/plugins/yunxin_alog/ios"
+
+SPEC CHECKSUMS:
+  AMap3DMap: dce25dd3e51e6b92109caa7d0c97fc6055830fb3
+  amap_flutter_location: 44ff5beb64f42e0bf5feb402fe299dac0013af6f
+  amap_flutter_map: 979e54d227cedac6c7504a2151bfbf3bcf96760a
+  AMapFoundation: 9885c48fc3a78fdfb84a0299a2293e56ea3c9fec
+  AMapLocation: 5248aec2455ebb5d104b367813c946430a2ee033
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  nim_core: f0406305d539f9e67ad4041c94a84fe5896e52e1
+  NIMSDK_LITE: 2c34ec060b2fb656d1c1eb15c2a434e66196e906
+  path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
+  yunxin_alog: c5532d2a6ab378baef9927fcae5ab19fe36c1103
+  YXAlog: ac9bab3aff1326caa72cc25aedc358bc8d4f1b31
+
+PODFILE CHECKSUM: 8505b5ee0dd82a1ab5ce797e0f22587641081af5
+
+COCOAPODS: 1.13.0
