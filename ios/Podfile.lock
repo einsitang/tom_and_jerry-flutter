@@ -21,6 +21,8 @@ PODS:
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
+  - permission_handler_apple (9.1.1):
+    - Flutter
   - yunxin_alog (0.0.1):
     - Flutter
     - YXAlog (~> 1.0.7)
@@ -32,6 +34,7 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - nim_core (from `.symlinks/plugins/nim_core/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
+  - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - yunxin_alog (from `.symlinks/plugins/yunxin_alog/ios`)
 
 SPEC REPOS:
@@ -53,6 +56,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/nim_core/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
+  permission_handler_apple:
+    :path: ".symlinks/plugins/permission_handler_apple/ios"
   yunxin_alog:
     :path: ".symlinks/plugins/yunxin_alog/ios"
 
@@ -66,6 +71,7 @@ SPEC CHECKSUMS:
   nim_core: f0406305d539f9e67ad4041c94a84fe5896e52e1
   NIMSDK_LITE: 2c34ec060b2fb656d1c1eb15c2a434e66196e906
   path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
+  permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
   yunxin_alog: c5532d2a6ab378baef9927fcae5ab19fe36c1103
   YXAlog: ac9bab3aff1326caa72cc25aedc358bc8d4f1b31
 

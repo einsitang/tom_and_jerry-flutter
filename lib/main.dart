@@ -49,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
     const MapPage mapPage = MapPage(title: "Map");
     const Icon page3 = Icon(Icons.person_outline);
 
-    const List<Widget> pages = [mapPage,imPage,page3];
+    const List<Widget> pages = [mapPage, imPage, page3];
 
     return DefaultTabController(
         length: pages.length,

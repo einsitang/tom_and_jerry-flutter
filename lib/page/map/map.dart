@@ -3,6 +3,7 @@ import 'package:amap_flutter_location/amap_flutter_location.dart';
 import 'package:amap_flutter_map/amap_flutter_map.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:logger/logger.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:tom_and_jerry/config/app_config.dart';
 
 final Logger log = Logger();
@@ -21,6 +22,8 @@ class _MapPageState extends State<MapPage> {
 
   late final AMapController _controller;
 
+  bool _keepLocation = false;
+
   @override
   void initState() {
     super.initState();
@@ -30,31 +33,92 @@ class _MapPageState extends State<MapPage> {
     // 隐私合规配置
     AMapFlutterLocation.updatePrivacyAgree(true);
     AMapFlutterLocation.updatePrivacyShow(true, true);
+
+    /// 动态申请定位权限
+    requestPermission();
   }
 
   void _moveLocation(Map<String, Object> result) {
     log.d("移动地图到定位点");
-    double latitude = double.parse(result["latitude"] as String);
-    double longitude = double.parse(result["longitude"] as String);
+    if (result['errorCode'] != null) {
+      log.d("无法完成地图移动:${result["errorInfo"]}");
+      return;
+    }
+
+    double latitude = double.tryParse("${result["latitude"]}") ?? double.nan;
+    double longitude = double.tryParse("${result["longitude"]}") ?? double.nan;
+    if ((latitude.isNaN) || longitude.isNaN) {
+      return;
+    }
     log.d("latitude : $latitude , longitude:$longitude");
-    _controller?.moveCamera(CameraUpdate.newCameraPosition(
-        CameraPosition(target: LatLng(latitude, longitude))));
+    _controller.moveCamera(CameraUpdate.newCameraPosition(
+        CameraPosition(target: LatLng(latitude, longitude), zoom: 15)));
     log.d("移动地图到定位点 done!");
+  }
+
+  void _startLocation(){
+    Future.delayed(const Duration(seconds:2),(){
+      _aMapFlutterLocation.startLocation();
+      log.d("开始定位...");
+    });
+  }
+
+  void _stopLocation(){
+    if(_keepLocation){
+      return ;
+    }
+    Future.delayed(const Duration(seconds:2),(){
+      _aMapFlutterLocation.stopLocation();
+      log.d("停止定位");
+    });
+  }
+
+  /// 动态申请定位权限
+  void requestPermission() async {
+    // 申请权限
+    bool hasLocationPermission = await requestLocationPermission();
+    if (hasLocationPermission) {
+      log.d("定位权限申请通过");
+    } else {
+      log.d("定位权限申请不通过");
+    }
+  }
+
+  /// 申请定位权限
+  /// 授予定位权限返回true， 否则返回false
+  Future<bool> requestLocationPermission() async {
+    //获取当前的权限
+    var status = await Permission.location.status;
+    if (status == PermissionStatus.granted) {
+      //已经授权
+      return true;
+    } else {
+      //未授权则发起一次申请
+      status = await Permission.location.request();
+      if (status == PermissionStatus.granted) {
+        return true;
+      } else {
+        return false;
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-
-    onMapCreated(AMapController controller) {
+    onMapCreated(AMapController controller)  {
       log.d("amap created / AMapController Assign");
       _controller = controller;
-      _aMapFlutterLocation.startLocation();
+
+      requestPermission();
+      _startLocation();
+
       _aMapFlutterLocation
           .onLocationChanged()
           .listen((Map<String, Object> result) {
         log.d("_aMapFlutterLocation.onLocationChanged() event");
-        log.d(result);
         _moveLocation(result);
+
+        _stopLocation();
       });
     }
 
@@ -89,7 +153,8 @@ class _MapPageState extends State<MapPage> {
   }
 
   @override
-  void dispose(){
+  void dispose() {
+    _aMapFlutterLocation.stopLocation();
     super.dispose();
   }
 }

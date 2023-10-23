@@ -37,7 +37,7 @@
 		<string>location</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
+	<string>LaunchScreen.storyboard</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>UISupportedInterfaceOrientations</key>
@@ -57,6 +57,8 @@
 	<false/>
 	<key>allowsBackgroundLocationUpdates</key>
 	<true/>
+	<key>UILaunchImageFile</key>
+	<string>LaunchImage</string>
 	<key>showsBackgroundLocationIndicator</key>
 	<true/>
 </dict>
