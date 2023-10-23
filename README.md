@@ -15,18 +15,36 @@ For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
-## Environment
+## Depend
 
-
-
+- dart SDK: '>=2.18.6 <3.0.0' // Null-Safety
+- flutter SDK: '^3.0.0'
+- jdk 11
 
 ## Build
 
 ### prebuild
 
-copy .env.example to .env
+```
+flutter pub get
+```
+
+copy `.env.example` to `.env`
+```
+cp .env.example .env
+```
+change `.env` configuration and use `builld_runner` make env work
 
 ```shell
 flutter pub run build_runner build
 ```
 
+### build-app
+
+```
+# build android
+flutter build apk
+
+# build ios
+flutter build ios
+```
