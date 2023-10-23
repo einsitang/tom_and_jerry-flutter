@@ -73,7 +73,7 @@ dependencies {
 
 //    api fileTree(dir: 'libs', include: ['*.jar'])
     // 3D地图
-    implementation 'com.amap.api:map3d:latest.integration'
+    implementation 'com.amap.api:3dmap:8.1.0'
     //搜索功能
     implementation 'com.amap.api:search:latest.integration'
     //定位功能
