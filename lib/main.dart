@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:tom_and_jerry/page/im/im.dart';
-import 'package:tom_and_jerry/page/map/map.dart';
+import 'package:logger/logger.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:tom_and_jerry/page/home.dart';
+import 'package:tom_and_jerry/provider/app_info_provider.dart';
+import 'package:tom_and_jerry/provider/isar/app_info_isar_provider.dart';
+import 'package:tom_and_jerry/state/app_info_state.dart';
+
+import 'model/app_info_model.dart';
+
+final Logger log = Logger();
 
 void main() {
   runApp(const MyApp());
@@ -15,16 +23,24 @@ class MyApp extends StatelessWidget {
       title: 'Tom and Jerry',
       themeMode: ThemeMode.system,
       theme: ThemeData(
+        // 修改 highlightColor 和 splashColor 移除 material 按钮特效
+        highlightColor: Colors.transparent,
+        splashColor: Colors.transparent,
         // primarySwatch: Colors.blue,
         brightness: Brightness.light,
       ),
       darkTheme: ThemeData(
+        // 修改 highlightColor 和 splashColor 移除 material 按钮特效
+        highlightColor: Colors.transparent,
+        splashColor: Colors.transparent,
         brightness: Brightness.dark,
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
+
+const HomePage homePage = HomePage(title: "home");
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -35,46 +51,31 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-const int defaultPageIndex = 1;
-
 class _MyHomePageState extends State<MyHomePage> {
-  int _pageIndex = defaultPageIndex;
-
   @override
   Widget build(BuildContext context) {
-    PageController pageController =
-        PageController(initialPage: defaultPageIndex);
+    AppInfoProvider appInfoProvider = AppInfoIsarProvider();
+    Future<AppInfoState> loadState() async {
+      AppInfoModel appInfoModel = await appInfoProvider.appInfo;
+      return AppInfoState(appInfoModel);
+    }
 
-    const ImPage imPage = ImPage(title: "Chat");
-    const MapPage mapPage = MapPage(title: "Map");
-    const Icon page3 = Icon(Icons.person_outline);
+    FutureBuilder futureBuilder = FutureBuilder<AppInfoState>(
+        future: loadState(),
+        builder: (context, AsyncSnapshot<AppInfoState> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Container(
+                color: Colors.white, child: const Text("Loading..."));
+          }
 
-    const List<Widget> pages = [mapPage, imPage, page3];
+          if (snapshot.hasError) {
+            log.e(snapshot.error);
+            log.e(snapshot.stackTrace);
+          }
 
-    return DefaultTabController(
-        length: pages.length,
-        child: Scaffold(
-          bottomNavigationBar: BottomNavigationBar(
-            currentIndex: _pageIndex,
-            items: const [
-              BottomNavigationBarItem(label: 'Map', icon: Icon(Icons.map)),
-              BottomNavigationBarItem(label: 'Chat', icon: Icon(Icons.chat)),
-              BottomNavigationBarItem(
-                  label: 'My', icon: Icon(Icons.person_outline)),
-            ],
-            onTap: (int page) {
-              setState(() {
-                _pageIndex = page;
-              });
-              pageController.jumpToPage(page);
-            },
-          ),
-          body: PageView(
-            controller: pageController,
-            // 禁止手势滑动
-            physics: const NeverScrollableScrollPhysics(),
-            children: pages,
-          ),
-        ));
+          return ScopedModel(model: snapshot.data!, child: homePage);
+        });
+
+    return futureBuilder;
   }
 }

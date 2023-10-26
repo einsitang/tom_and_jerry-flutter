@@ -110,7 +110,7 @@ class _MapPageState extends State<MapPage> {
       _controller = controller;
 
       requestPermission();
-      _startLocation();
+      // _startLocation();
 
       _aMapFlutterLocation
           .onLocationChanged()

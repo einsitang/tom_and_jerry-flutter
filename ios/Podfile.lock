@@ -11,6 +11,8 @@ PODS:
   - AMapLocation (2.10.0):
     - AMapFoundation (>= 1.8.0)
   - Flutter (1.0.0)
+  - isar_flutter_libs (1.0.0):
+    - Flutter
   - nim_core (1.4.7):
     - Flutter
     - NIMSDK_LITE (~> 9.11.0)
@@ -32,6 +34,7 @@ DEPENDENCIES:
   - amap_flutter_location (from `.symlinks/plugins/amap_flutter_location/ios`)
   - amap_flutter_map (from `.symlinks/plugins/amap_flutter_map/ios`)
   - Flutter (from `Flutter`)
+  - isar_flutter_libs (from `.symlinks/plugins/isar_flutter_libs/ios`)
   - nim_core (from `.symlinks/plugins/nim_core/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
@@ -52,6 +55,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/amap_flutter_map/ios"
   Flutter:
     :path: Flutter
+  isar_flutter_libs:
+    :path: ".symlinks/plugins/isar_flutter_libs/ios"
   nim_core:
     :path: ".symlinks/plugins/nim_core/ios"
   path_provider_foundation:
@@ -68,6 +73,7 @@ SPEC CHECKSUMS:
   AMapFoundation: 9885c48fc3a78fdfb84a0299a2293e56ea3c9fec
   AMapLocation: 5248aec2455ebb5d104b367813c946430a2ee033
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  isar_flutter_libs: b69f437aeab9c521821c3f376198c4371fa21073
   nim_core: f0406305d539f9e67ad4041c94a84fe5896e52e1
   NIMSDK_LITE: 2c34ec060b2fb656d1c1eb15c2a434e66196e906
   path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943

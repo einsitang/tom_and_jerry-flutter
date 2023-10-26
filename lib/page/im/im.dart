@@ -1,10 +1,16 @@
 import 'dart:io';
 
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:nim_core/nim_core.dart';
-import 'package:tom_and_jerry/page/im/chat_list.dart';
+import 'package:scoped_model/scoped_model.dart';
 import "package:tom_and_jerry/config/app_config.dart";
+import 'package:tom_and_jerry/page/home.dart';
+import 'package:tom_and_jerry/page/im/chat_list.dart';
+
+import '../../model/app_info_model.dart';
+import '../../state/app_info_state.dart';
 
 final Logger log = Logger();
 
@@ -18,7 +24,11 @@ class ImPage extends StatefulWidget {
 }
 
 class _ImPageState extends State<ImPage> {
-  late String _message;
+  // late String _message;
+
+  AppInfoState get _appInfoState => ScopedModel.of<AppInfoState>(context);
+
+  final ChatListPage chatListPage = const ChatListPage();
 
   void _initPlugins() {
     // ChatKitClient.init();
@@ -86,18 +96,18 @@ class _ImPageState extends State<ImPage> {
     });
   }
 
-  void _sendMessage(String text) async {
-    String sendAccount = "test_1";
-    NIMResult<NIMMessage> messageResult =
-        await MessageBuilder.createTextMessage(
-            sessionId: sendAccount,
-            sessionType: NIMSessionType.p2p,
-            text: text);
-    if (messageResult.isSuccess) {
-      NimCore.instance.messageService.sendMessage(message: messageResult.data!);
-      log.d("发送文本:$text 成功");
-    }
-  }
+  // void _sendMessage(String text) async {
+  //   String sendAccount = "test_1";
+  //   NIMResult<NIMMessage> messageResult =
+  //       await MessageBuilder.createTextMessage(
+  //           sessionId: sendAccount,
+  //           sessionType: NIMSessionType.p2p,
+  //           text: text);
+  //   if (messageResult.isSuccess) {
+  //     NimCore.instance.messageService.sendMessage(message: messageResult.data!);
+  //     log.d("发送文本:$text 成功");
+  //   }
+  // }
 
   @override
   void initState() {
@@ -106,43 +116,143 @@ class _ImPageState extends State<ImPage> {
     _initSDK();
   }
 
-  final TextEditingController _messageController = TextEditingController();
+  // final TextEditingController _messageController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    ChatListPage chatListPage = const ChatListPage();
+    log.d("im page rebuild...");
 
-    Widget bodyContentWidget = Column(children: [
-      TextField(
-        controller: _messageController,
-        decoration: const InputDecoration(
-          border: OutlineInputBorder(),
-          hintText: 'Enter Message',
+    // Widget bodyContentWidget = Column(children: [
+    //   TextField(
+    //     controller: _messageController,
+    //     decoration: const InputDecoration(
+    //       border: OutlineInputBorder(),
+    //       hintText: 'Enter Message',
+    //     ),
+    //   ),
+    //   IconButton(
+    //       icon: const Icon(Icons.mail),
+    //       onPressed: () {
+    //         _sendMessage(_messageController.text);
+    //         _messageController.clear();
+    //       })
+    // ]);
+    //
+    // Widget bodyWidget =
+    //     Container(padding: const EdgeInsets.all(10), child: bodyContentWidget);
+
+    Widget loggedInfoWidget = GestureDetector(child:
+        ScopedModelDescendant<AppInfoState>(builder: (context, child, model) {
+      Color onlineColor = Colors.greenAccent;
+      Color offlineColor = Colors.white;
+      return Row(children: [
+        CircleAvatar(
+            radius: 22,
+            // 背景颜色形成的效果可以考虑设置 在线(online) 与 不在线(offline)
+            backgroundColor: onlineColor,
+            child: CircleAvatar(
+                radius: 20,
+                //头像图片 -> NetworkImage网络图片，AssetImage项目资源包图片, FileImage本地存储图片
+                backgroundImage:
+                    NetworkImage(_appInfoState.state.userProfile!.avatar!))),
+        Container(
+            margin: const EdgeInsetsDirectional.fromSTEB(15, 0, 10, 0),
+            child: Text("${_appInfoState.state.userProfile!.name} - online",
+                style: const TextStyle(fontSize: 16))),
+      ]);
+    }), onTap: () {
+      log.d("jump to page 2");
+      const HomePageJumpPageNotification(page: 2).dispatch(context);
+    });
+
+    Widget notLoggedInfoWidget = TextButton(
+        onPressed: () {
+          log.d("jump to page 2");
+          const HomePageJumpPageNotification(page: 2).dispatch(context);
+        },
+        child: const Text("请先登录", style: TextStyle(color: Colors.white)));
+    Widget titleWidget =
+        ScopedModelDescendant<AppInfoState>(builder: (context, child, model) {
+      return _appInfoState.state.loginAuth.isLogin
+          ? loggedInfoWidget
+          : notLoggedInfoWidget;
+    });
+
+    DropdownButtonHideUnderline dropdownButtonHideUnderline =
+        DropdownButtonHideUnderline(
+            child: DropdownButton2(
+      customButton: const SizedBox(width: 50, child: Icon(Icons.add)),
+      items: [
+        ...MenuItems.firstItems.map(
+          (item) => DropdownMenuItem<MenuItem>(
+            value: item,
+            child: MenuItems.buildItem(item),
+          ),
         ),
+        const DropdownMenuItem<Divider>(enabled: false, child: Divider()),
+        ...MenuItems.secondItems.map(
+          (item) => DropdownMenuItem<MenuItem>(
+            value: item,
+            child: MenuItems.buildItem(item),
+          ),
+        ),
+      ],
+      onChanged: (value) {
+        MenuItems.onChanged(context, value! as MenuItem);
+      },
+      dropdownStyleData: DropdownStyleData(
+        width: 160,
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+          // color: Colors.redAccent,
+        ),
+        offset: const Offset(0, 8),
       ),
-      IconButton(
-          icon: const Icon(Icons.mail),
-          onPressed: () {
-            _sendMessage(_messageController.text);
-            _messageController.clear();
-          })
-    ]);
+      menuItemStyleData: MenuItemStyleData(
+        customHeights: [
+          ...List<double>.filled(MenuItems.firstItems.length, 48),
+          8,
+          ...List<double>.filled(MenuItems.secondItems.length, 48),
+        ],
+        padding: const EdgeInsets.only(left: 16, right: 16),
+      ),
+    ));
 
-    Widget bodyWidget =
-        Container(padding: const EdgeInsets.all(10), child: bodyContentWidget);
-
-    return Scaffold(
-        appBar: AppBar(title: Text(widget.title), actions: [
+    Widget bodyWidget = Scaffold(
+        appBar: AppBar(title: titleWidget, actions: [
+          ScopedModelDescendant<AppInfoState>(builder: (context, child, model) {
+            return IconButton(
+                icon: const Icon(Icons.login),
+                onPressed: () {
+                  /// 搜素框，模拟登录效果，待移除代码
+                  LoginAuth loginAuth = _appInfoState.state.loginAuth;
+                  if (_appInfoState.state.loginAuth.isLogin) {
+                    loginAuth.accessToken = null;
+                  } else {
+                    loginAuth.accessToken = "isLogin";
+                    UserProfile userProfile = UserProfile();
+                    userProfile.avatar =
+                        "https://pic2.zhimg.com/v2-639b49f2f6578eabddc458b84eb3c6a1.jpg";
+                    userProfile.name = "爱因斯唐";
+                    _appInfoState.updateUserProfile(userProfile);
+                  }
+                  _appInfoState.updateLoginAuth(loginAuth);
+                });
+          }),
           IconButton(
-              icon: const Icon(Icons.search),
               onPressed: () {
                 log.d("search chats");
-              }),
-          IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: () {
-                log.d("leading on tap");
-              }),
+              },
+              icon: const Icon(Icons.search)),
+
+          dropdownButtonHideUnderline,
+
+          // IconButton(
+          //     icon: const Icon(Icons.add),
+          //     onPressed: () {
+          //       log.d("leading on tap");
+          //     }),
         ]),
         body: DefaultTabController(
             length: 2,
@@ -159,5 +269,63 @@ class _ImPageState extends State<ImPage> {
                 const Icon(Icons.directions_bike),
               ]),
             )));
+    return ScopedModelDescendant<AppInfoState>(
+        builder: (context, child, model) => bodyWidget);
+  }
+}
+
+class MenuItem {
+  const MenuItem({
+    required this.text,
+    required this.icon,
+  });
+
+  final String text;
+  final IconData icon;
+}
+
+abstract class MenuItems {
+  static const List<MenuItem> firstItems = [home, share, settings];
+  static const List<MenuItem> secondItems = [logout];
+
+  static const home = MenuItem(text: 'Home', icon: Icons.home);
+  static const share = MenuItem(text: 'Share', icon: Icons.share);
+  static const settings = MenuItem(text: 'Settings', icon: Icons.settings);
+  static const logout = MenuItem(text: 'Log Out', icon: Icons.logout);
+
+  static Widget buildItem(MenuItem item) {
+    return Row(
+      children: [
+        Icon(item.icon, color: Colors.black, size: 22),
+        const SizedBox(
+          width: 10,
+        ),
+        Expanded(
+          child: Text(
+            item.text,
+            style: const TextStyle(
+              color: Colors.black,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  static void onChanged(BuildContext context, MenuItem item) {
+    switch (item) {
+      case MenuItems.home:
+        //Do something
+        break;
+      case MenuItems.settings:
+        //Do something
+        break;
+      case MenuItems.share:
+        //Do something
+        break;
+      case MenuItems.logout:
+        //Do something
+        break;
+    }
   }
 }

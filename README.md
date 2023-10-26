@@ -21,7 +21,7 @@ samples, guidance on mobile development, and a full API reference.
 - flutter SDK: '^3.0.0'
 - jdk 11
 - NIM SDK (网易即时通讯SDK) - https://doc.yunxin.163.com/messaging/docs/home-page?platform=flutter
-- AMP SDK (高德地图SDK) - https://lbs.amap.com/api/flutter/gettingstarted
+- AMAP SDK (高德地图SDK) - https://lbs.amap.com/api/flutter/gettingstarted
 
 ## Build
 
