@@ -54,6 +54,8 @@ class _HomePageState extends State<HomePage> {
       log.d("未登录用户");
     }
 
+    log.d("main page build");
+
     final List<Widget> pages = [mapPage, imPage, profilePage];
 
     bool mapNotice = true;
@@ -64,11 +66,14 @@ class _HomePageState extends State<HomePage> {
       currentIndex: _pageIndex,
       items: [
         CustomNavigationBarItem(
-            icon: badges.Badge(
-                showBadge: mapNotice,
-                badgeContent: const Text("!",
-                    style: TextStyle(fontSize: 11, color: Colors.white)),
-                child: const Icon(Icons.map)),
+            icon: ScopedModelDescendant<AppInfoState>(
+                builder: (context, child, model) {
+              return badges.Badge(
+                  showBadge: _appInfoState.state.loginAuth.isLogin,
+                  badgeContent: const Text("!",
+                      style: TextStyle(fontSize: 11, color: Colors.white)),
+                  child: const Icon(Icons.map));
+            }),
             title: const Text("map",
                 style: TextStyle(fontWeight: FontWeight.w300)),
             selectedTitle: const Text("Map",
@@ -102,39 +107,6 @@ class _HomePageState extends State<HomePage> {
       },
     );
 
-    BottomNavigationBar bottomNavigationBar = BottomNavigationBar(
-      currentIndex: _pageIndex,
-      items: [
-        BottomNavigationBarItem(
-            label: 'Map',
-            icon: badges.Badge(
-                showBadge: mapNotice,
-                badgeContent: const Text("!",
-                    style: TextStyle(fontSize: 11, color: Colors.white)),
-                child: const Icon(Icons.map))),
-        BottomNavigationBarItem(
-            label: 'Chat',
-            icon: badges.Badge(
-                showBadge: imUnread > 0,
-                badgeContent: Text("${imUnread > 99 ? 99 : imUnread}",
-                    style: const TextStyle(fontSize: 11, color: Colors.white)),
-                child: const Icon(Icons.chat))),
-        BottomNavigationBarItem(
-            label: 'My',
-            icon: badges.Badge(
-                showBadge: profileNotice,
-                badgeContent: const Text("!",
-                    style: TextStyle(fontSize: 11, color: Colors.white)),
-                child: const Icon(Icons.person_outline))),
-      ],
-      onTap: (int page) {
-        setState(() {
-          _pageIndex = page;
-        });
-        pageController.jumpToPage(page);
-      },
-    );
-
     DefaultTabController tabController = DefaultTabController(
         length: pages.length,
         child: Scaffold(
@@ -146,6 +118,7 @@ class _HomePageState extends State<HomePage> {
             children: pages,
           ),
         ));
+
     return NotificationListener<HomePageJumpPageNotification>(
         onNotification: (notification) {
           int page = notification.page;

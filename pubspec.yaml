@@ -52,6 +52,8 @@ dependencies:
   badges: ^3.1.1
   custom_navigation_bar: ^0.8.2
   dropdown_button2: ^2.1.4
+  crypto: ^3.0.3
+  cached_network_image: ^3.2.3
 
 #  # 消息组件（聊天界面，包括单聊和群聊）
 #  nim_chatkit_ui: ^1.1.0

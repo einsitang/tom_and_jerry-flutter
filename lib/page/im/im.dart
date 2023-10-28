@@ -145,6 +145,7 @@ class _ImPageState extends State<ImPage> {
         ScopedModelDescendant<AppInfoState>(builder: (context, child, model) {
       Color onlineColor = Colors.greenAccent;
       Color offlineColor = Colors.white;
+
       return Row(children: [
         CircleAvatar(
             radius: 22,
@@ -173,51 +174,11 @@ class _ImPageState extends State<ImPage> {
         child: const Text("请先登录", style: TextStyle(color: Colors.white)));
     Widget titleWidget =
         ScopedModelDescendant<AppInfoState>(builder: (context, child, model) {
+          log.d("titleWidget build");
       return _appInfoState.state.loginAuth.isLogin
           ? loggedInfoWidget
           : notLoggedInfoWidget;
     });
-
-    DropdownButtonHideUnderline dropdownButtonHideUnderline =
-        DropdownButtonHideUnderline(
-            child: DropdownButton2(
-      customButton: const SizedBox(width: 50, child: Icon(Icons.add)),
-      items: [
-        ...MenuItems.firstItems.map(
-          (item) => DropdownMenuItem<MenuItem>(
-            value: item,
-            child: MenuItems.buildItem(item),
-          ),
-        ),
-        const DropdownMenuItem<Divider>(enabled: false, child: Divider()),
-        ...MenuItems.secondItems.map(
-          (item) => DropdownMenuItem<MenuItem>(
-            value: item,
-            child: MenuItems.buildItem(item),
-          ),
-        ),
-      ],
-      onChanged: (value) {
-        MenuItems.onChanged(context, value! as MenuItem);
-      },
-      dropdownStyleData: DropdownStyleData(
-        width: 160,
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(4),
-          // color: Colors.redAccent,
-        ),
-        offset: const Offset(0, 8),
-      ),
-      menuItemStyleData: MenuItemStyleData(
-        customHeights: [
-          ...List<double>.filled(MenuItems.firstItems.length, 48),
-          8,
-          ...List<double>.filled(MenuItems.secondItems.length, 48),
-        ],
-        padding: const EdgeInsets.only(left: 16, right: 16),
-      ),
-    ));
 
     Widget bodyWidget = Scaffold(
         appBar: AppBar(title: titleWidget, actions: [
@@ -225,19 +186,7 @@ class _ImPageState extends State<ImPage> {
             return IconButton(
                 icon: const Icon(Icons.login),
                 onPressed: () {
-                  /// 搜素框，模拟登录效果，待移除代码
-                  LoginAuth loginAuth = _appInfoState.state.loginAuth;
-                  if (_appInfoState.state.loginAuth.isLogin) {
-                    loginAuth.accessToken = null;
-                  } else {
-                    loginAuth.accessToken = "isLogin";
-                    UserProfile userProfile = UserProfile();
-                    userProfile.avatar =
-                        "https://pic2.zhimg.com/v2-639b49f2f6578eabddc458b84eb3c6a1.jpg";
-                    userProfile.name = "爱因斯唐";
-                    _appInfoState.updateUserProfile(userProfile);
-                  }
-                  _appInfoState.updateLoginAuth(loginAuth);
+
                 });
           }),
           IconButton(
@@ -245,14 +194,10 @@ class _ImPageState extends State<ImPage> {
                 log.d("search chats");
               },
               icon: const Icon(Icons.search)),
-
-          dropdownButtonHideUnderline,
-
-          // IconButton(
-          //     icon: const Icon(Icons.add),
-          //     onPressed: () {
-          //       log.d("leading on tap");
-          //     }),
+          ScopedModelDescendant<AppInfoState>(builder: (context, child, model) {
+            log.d("add button widget build");
+            return _buildAddButtonWidget();
+          }),
         ]),
         body: DefaultTabController(
             length: 2,
@@ -272,6 +217,63 @@ class _ImPageState extends State<ImPage> {
     return ScopedModelDescendant<AppInfoState>(
         builder: (context, child, model) => bodyWidget);
   }
+
+  /// 动态构建 add button 组件
+  _buildAddButtonWidget(){
+
+    DropdownMenuItem<MenuItem> switchLoginMenuItem(bool isLogin) {
+      if (isLogin) {
+        return DropdownMenuItem<MenuItem>(
+            value: MenuItems.logout, child: MenuItems.buildItem(MenuItems.logout));
+      }
+
+      return DropdownMenuItem<MenuItem>(
+          value: MenuItems.login, child: MenuItems.buildItem(MenuItems.login));
+    }
+    DropdownMenuItem<MenuItem> loginOrOutMenuItem = switchLoginMenuItem(_appInfoState.state.loginAuth.isLogin);
+    DropdownButtonHideUnderline addButtonWidget = DropdownButtonHideUnderline(
+        child: DropdownButton2(
+          customButton: const SizedBox(width: 50, child: Icon(Icons.add)),
+          items: [
+            ...MenuItems.firstItems.map(
+                  (item) => DropdownMenuItem<MenuItem>(
+                value: item,
+                child: MenuItems.buildItem(item),
+              ),
+            ),
+            const DropdownMenuItem<Divider>(enabled: false, child: Divider()),
+            loginOrOutMenuItem,
+            // ...MenuItems.secondItems.map(
+            //   (item) => DropdownMenuItem<MenuItem>(
+            //     value: item,
+            //     child: MenuItems.buildItem(item),
+            //   ),
+            // ),
+          ],
+          onChanged: (value) {
+            MenuItems.onChanged(context, value! as MenuItem);
+          },
+          dropdownStyleData: DropdownStyleData(
+            width: 160,
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(4),
+              // color: Colors.redAccent,
+            ),
+            offset: const Offset(0, 8),
+          ),
+          menuItemStyleData: MenuItemStyleData(
+            customHeights: [
+              ...List<double>.filled(MenuItems.firstItems.length, 48),
+              8,  // 分割符高度
+              48, // login / logout 高度
+            ],
+            padding: const EdgeInsets.only(left: 16, right: 16),
+          ),
+        ));
+
+    return addButtonWidget;
+  }
 }
 
 class MenuItem {
@@ -286,12 +288,13 @@ class MenuItem {
 
 abstract class MenuItems {
   static const List<MenuItem> firstItems = [home, share, settings];
-  static const List<MenuItem> secondItems = [logout];
+  static const List<MenuItem> secondItems = [logout, login];
 
   static const home = MenuItem(text: 'Home', icon: Icons.home);
   static const share = MenuItem(text: 'Share', icon: Icons.share);
   static const settings = MenuItem(text: 'Settings', icon: Icons.settings);
   static const logout = MenuItem(text: 'Log Out', icon: Icons.logout);
+  static const login = MenuItem(text: "Log In", icon: Icons.login);
 
   static Widget buildItem(MenuItem item) {
     return Row(
@@ -313,18 +316,33 @@ abstract class MenuItems {
   }
 
   static void onChanged(BuildContext context, MenuItem item) {
+    AppInfoState appInfoState = ScopedModel.of<AppInfoState>(context);
+    LoginAuth loginAuth = appInfoState.state.loginAuth;
     switch (item) {
       case MenuItems.home:
-        //Do something
+        log.d("home button : ${appInfoState.state.loginAuth.isLogin}");
         break;
       case MenuItems.settings:
         //Do something
+        log.d("on settings button");
         break;
       case MenuItems.share:
         //Do something
         break;
+      case MenuItems.login:
+        loginAuth.accessToken = "isLogin";
+        UserProfile userProfile = UserProfile();
+        userProfile.avatar = "https://xsgames.co/randomusers/avatar.php?g=pixel";
+        // userProfile.avatar =
+        //     "https://pic2.zhimg.com/v2-639b49f2f6578eabddc458b84eb3c6a1.jpg";
+        userProfile.name = "爱因斯唐";
+        appInfoState.updateUserProfile(userProfile);
+        appInfoState.updateLoginAuth(loginAuth);
+        break;
       case MenuItems.logout:
         //Do something
+        loginAuth.accessToken = null;
+        appInfoState.updateLoginAuth(loginAuth);
         break;
     }
   }

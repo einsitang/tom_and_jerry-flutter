@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:logger/logger.dart';
 
@@ -13,14 +15,14 @@ class ChatListPage extends StatefulWidget {
 }
 
 class _ChatListPageState extends State<ChatListPage> {
-
   @override
   Widget build(BuildContext context) {
+    log.d("chat list page build .");
+    Random random = Random();
     return ListView(
-      padding: const EdgeInsets.all(8.0),
-      itemExtent: 106.0,
-      children: List.generate(10, (index) => ChatListItemPage(chatId:"_$index"))
-    );
+        padding: const EdgeInsets.only(top:8.0,bottom: 8.0,left: 5,right: 5),
+        children: List.generate(20,
+            (index) => ChatListItemPage(
+                chatId: "_$index", randomCode: random.nextInt(50))));
   }
-
 }
