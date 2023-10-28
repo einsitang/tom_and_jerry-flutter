@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:badges/badges.dart' as badges;
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:common_utils/common_utils.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
@@ -28,10 +29,18 @@ class _ChatListItemState extends State<ChatListItemPage> {
     // user chatService get chat detail
 
     int randUnReadCount = Random().nextInt(99);
+    DateTime randomDateTime =
+        DateTime.now().add(Duration(seconds: -(Random().nextInt(91765) + 60)));
+    String briefDayFormat = TimelineUtil.formatByDateTime(randomDateTime,
+        locale: "zh", dayFormat: DayFormat.Common);
 
     String mockAvatarImg =
         "https://xsgames.co/randomusers/assets/avatars/pixel/${widget.randomCode}.jpg";
 
+    // 默认 size 64 的 Icon 对象
+    icon64(IconData icon){
+      return Icon(icon,size:64);
+    }
     /// 头像
     CircleAvatar chatAvatar = CircleAvatar(
         radius: 33,
@@ -42,10 +51,10 @@ class _ChatListItemState extends State<ChatListItemPage> {
           height: 64,
           imageUrl: mockAvatarImg,
           fit: BoxFit.cover,
-          placeholder: (context, url) => const Icon(Icons.account_circle_rounded,size: 64),
+          placeholder: (context, url) => icon64(Icons.account_circle_rounded),
           errorWidget: (context, url, error) {
             log.e(error);
-            return const Icon(Icons.error,size:64);
+            return icon64(Icons.error);
           },
         )));
 
@@ -60,9 +69,9 @@ class _ChatListItemState extends State<ChatListItemPage> {
 
       /// 时间
       Container(
-          width: 120,
+          width: 130,
           alignment: Alignment.topRight,
-          child: const Text("19:23", style: TextStyle(color: Colors.black54)))
+          child: Text(briefDayFormat, style: const TextStyle(color: Colors.black54)))
     ]);
 
     Widget chatDigest = Row(children: [
@@ -75,8 +84,7 @@ class _ChatListItemState extends State<ChatListItemPage> {
                   overflow: TextOverflow.ellipsis,
                   softWrap: true,
                   maxLines: 3,
-                  style:
-                      TextStyle(fontSize: 12, fontWeight: FontWeight.normal)))),
+                  style: TextStyle(fontSize: 12)))),
 
       /// 小红点
       Container(
@@ -100,12 +108,12 @@ class _ChatListItemState extends State<ChatListItemPage> {
       decoration: BoxDecoration(
           color: _color,
           // border: const Border(bottom: BorderSide(color: Colors.black12)),
-          borderRadius: const BorderRadius.all(Radius.circular(6.0)),
+          borderRadius: const BorderRadius.all(Radius.circular(5.0)),
           boxShadow: const [
             BoxShadow(
                 color: Colors.black26,
                 offset: Offset(1.0, 1.0),
-                blurRadius: 2.0)
+                blurRadius: 0.5)
           ]),
       curve: Curves.linearToEaseOut,
       duration: const Duration(milliseconds: 300),
@@ -159,7 +167,6 @@ class _ChatListItemState extends State<ChatListItemPage> {
         onLongPressDown: (LongPressDownDetails details) {
           setState(() {
             _color = Colors.lightBlue.shade100;
-            // _color = const Color.fromRGBO(0x38, 0xB0, 0xDE, 0.8);
           });
         },
         onLongPressUp: () {

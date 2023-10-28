@@ -54,6 +54,7 @@ dependencies:
   dropdown_button2: ^2.1.4
   crypto: ^3.0.3
   cached_network_image: ^3.2.3
+  common_utils: ^2.1.0
 
 #  # 消息组件（聊天界面，包括单聊和群聊）
 #  nim_chatkit_ui: ^1.1.0
