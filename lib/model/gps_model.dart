@@ -22,4 +22,3 @@ class GpsModel {
   /// 更新时间
   DateTime? updateTime;
 }
-

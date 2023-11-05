@@ -22,7 +22,7 @@ class _MapPageState extends State<MapPage> {
 
   late final AMapController _controller;
 
-  bool _keepLocation = false;
+  final bool _keepLocation = false;
 
   @override
   void initState() {
@@ -56,18 +56,18 @@ class _MapPageState extends State<MapPage> {
     log.d("移动地图到定位点 done!");
   }
 
-  void _startLocation(){
-    Future.delayed(const Duration(seconds:2),(){
+  void _startLocation() {
+    Future.delayed(const Duration(seconds: 2), () {
       _aMapFlutterLocation.startLocation();
       log.d("开始定位...");
     });
   }
 
-  void _stopLocation(){
-    if(_keepLocation){
-      return ;
+  void _stopLocation() {
+    if (_keepLocation) {
+      return;
     }
-    Future.delayed(const Duration(seconds:2),(){
+    Future.delayed(const Duration(seconds: 2), () {
       _aMapFlutterLocation.stopLocation();
       log.d("停止定位");
     });
@@ -105,7 +105,7 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
-    onMapCreated(AMapController controller)  {
+    onMapCreated(AMapController controller) {
       log.d("amap created / AMapController Assign");
       _controller = controller;
 

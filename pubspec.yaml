@@ -50,11 +50,17 @@ dependencies:
   path_provider: ^2.1.0
   scoped_model: ^2.0.0
   badges: ^3.1.1
-  custom_navigation_bar: ^0.8.2
+#  custom_navigation_bar: ^0.8.2
+  custom_navigation_bar:
+    git:
+      url: https://github.com/einsitang/custom_bubble_navigation_bar
   dropdown_button2: ^2.1.4
   crypto: ^3.0.3
   cached_network_image: ^3.2.3
   common_utils: ^2.1.0
+  faker: ^2.1.0
+  settings_ui: ^2.0.2
+  flutter_svg: ^2.0.5
 
 #  # 消息组件（聊天界面，包括单聊和群聊）
 #  nim_chatkit_ui: ^1.1.0

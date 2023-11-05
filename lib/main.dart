@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:tom_and_jerry/common/app_theme.dart';
+import 'package:tom_and_jerry/model/app_info_model.dart';
 import 'package:tom_and_jerry/page/home.dart';
 import 'package:tom_and_jerry/provider/app_info_provider.dart';
 import 'package:tom_and_jerry/provider/isar/app_info_isar_provider.dart';
 import 'package:tom_and_jerry/state/app_info_state.dart';
-
-import 'model/app_info_model.dart';
 
 final Logger log = Logger();
 
@@ -14,44 +14,43 @@ void main() {
   runApp(const MyApp());
 }
 
+const HomePage _homePage = HomePage(HomePageTab.defaultTab, title: "home");
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  final String appTitle = "Tom And Jerry";
+
+  final HomePage _homePage =
+      const HomePage(HomePageTab.defaultTab, title: "home");
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Tom and Jerry',
+    final materialApp = MaterialApp(
+      title: appTitle,
       themeMode: ThemeMode.system,
-      theme: ThemeData(
-        // 修改 highlightColor 和 splashColor 移除 material 按钮特效
-        highlightColor: Colors.transparent,
-        splashColor: Colors.transparent,
-        // primarySwatch: Colors.blue,
-        brightness: Brightness.light,
-      ),
-      darkTheme: ThemeData(
-        // 修改 highlightColor 和 splashColor 移除 material 按钮特效
-        highlightColor: Colors.transparent,
-        splashColor: Colors.transparent,
-        brightness: Brightness.dark,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      home: StarterApp(title: appTitle),
+      routes: <String, WidgetBuilder>{
+        HomePage.routeName: (context) => _homePage
+      },
     );
+
+    return materialApp;
   }
 }
 
-const HomePage homePage = HomePage(title: "home");
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+class StarterApp extends StatefulWidget {
+  const StarterApp({super.key, required this.title});
 
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<StarterApp> createState() => _StarterAppState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _StarterAppState extends State<StarterApp> {
   @override
   Widget build(BuildContext context) {
     AppInfoProvider appInfoProvider = AppInfoIsarProvider();
@@ -64,8 +63,8 @@ class _MyHomePageState extends State<MyHomePage> {
         future: loadState(),
         builder: (context, AsyncSnapshot<AppInfoState> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Container(
-                color: Colors.white, child: const Text("Loading..."));
+            /// 此处可以放加载页面，如果广告、动画界面
+            return Container(color: Colors.white);
           }
 
           if (snapshot.hasError) {
@@ -73,7 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
             log.e(snapshot.stackTrace);
           }
 
-          return ScopedModel(model: snapshot.data!, child: homePage);
+          return ScopedModel(model: snapshot.data!, child: _homePage);
         });
 
     return futureBuilder;

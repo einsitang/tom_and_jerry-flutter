@@ -3,17 +3,20 @@ import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:tom_and_jerry/common/app_theme.dart';
+import 'package:tom_and_jerry/page/im/im.dart';
+import 'package:tom_and_jerry/page/map/map.dart';
 import 'package:tom_and_jerry/page/profile/profile.dart';
-
-import '../state/app_info_state.dart';
-import 'im/im.dart';
-import 'map/map.dart';
+import 'package:tom_and_jerry/state/app_info_state.dart';
 
 final Logger log = Logger();
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key, required this.title});
+  static const String routeName = "/home";
 
+  const HomePage(this.tab, {super.key, required this.title});
+
+  final HomePageTab tab;
   final String title;
 
   @override
@@ -21,41 +24,61 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageJumpPageNotification extends Notification {
-  const HomePageJumpPageNotification({required this.page});
+  const HomePageJumpPageNotification({required this.tab});
 
-  final int page;
+  final HomePageTab tab;
 }
 
-const int defaultPageIndex = 1;
+enum HomePageTab {
+  /// 地图 tab
+  MAP(0),
+
+  /// 即时聊天 TAB
+  IM(1),
+
+  /// 个人资料 TAB
+  PROFILE(2);
+
+  static const HomePageTab defaultTab = HomePageTab.IM;
+
+  final int tabIndex;
+
+  const HomePageTab(this.tabIndex);
+
+  static of(int tabIndex) {
+    if (tabIndex < 0 || tabIndex > HomePageTab.values.length - 1) {
+      return defaultTab;
+    }
+    return HomePageTab.values[tabIndex];
+  }
+}
+
+const ImPage imPage = ImPage(title: "Chat");
+const MapPage mapPage = MapPage(title: "Map");
+const ProfilePage profilePage = ProfilePage(title: "Profile");
 
 class _HomePageState extends State<HomePage> {
-  int _pageIndex = defaultPageIndex;
+  late PageController _pageController;
 
-  final PageController pageController =
-      PageController(initialPage: defaultPageIndex);
-
-  final ImPage imPage = const ImPage(title: "Chat");
-  final MapPage mapPage = const MapPage(title: "Map");
-  final ProfilePage profilePage = const ProfilePage(title: "Profile");
+  late HomePageTab _tab;
 
   AppInfoState get _appInfoState => ScopedModel.of<AppInfoState>(context);
 
-  jumpPage(int page) {
-    setState(() {
-      _pageIndex = page;
-    });
-    pageController.jumpToPage(page);
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: widget.tab.tabIndex);
+    _tab = widget.tab;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    bool isLogin = _appInfoState.state.loginAuth.isLogin;
-    if (isLogin) {
-      log.d("未登录用户");
-    }
+  jumpPage(HomePageTab tab) {
+    setState(() {
+      _tab = tab;
+    });
+    _pageController.jumpToPage(tab.tabIndex);
+  }
 
-    log.d("main page build");
-
+  Widget _buildHomePage(BuildContext context) {
     final List<Widget> pages = [mapPage, imPage, profilePage];
 
     bool mapNotice = true;
@@ -63,7 +86,8 @@ class _HomePageState extends State<HomePage> {
     bool profileNotice = false;
 
     CustomNavigationBar customNavigationBar = CustomNavigationBar(
-      currentIndex: _pageIndex,
+      currentIndex: _tab.tabIndex,
+      brightness: AppTheme.of(context).brightness,
       items: [
         CustomNavigationBarItem(
             icon: ScopedModelDescendant<AppInfoState>(
@@ -100,35 +124,49 @@ class _HomePageState extends State<HomePage> {
                 const Text("My", style: TextStyle(fontWeight: FontWeight.w600)))
       ],
       onTap: (int page) {
-        setState(() {
-          _pageIndex = page;
-        });
-        pageController.jumpToPage(page);
+        jumpPage(HomePageTab.of(page));
       },
     );
 
     DefaultTabController tabController = DefaultTabController(
         length: pages.length,
         child: Scaffold(
-          bottomNavigationBar: customNavigationBar,
+          bottomNavigationBar:
+              Theme(data: AppTheme.of(context), child: customNavigationBar),
           body: PageView(
-            controller: pageController,
+            controller: _pageController,
             // 禁止手势滑动
             physics: const NeverScrollableScrollPhysics(),
             children: pages,
           ),
         ));
 
-    return NotificationListener<HomePageJumpPageNotification>(
-        onNotification: (notification) {
-          int page = notification.page;
-          setState(() {
-            _pageIndex = page;
-          });
+    return tabController;
+  }
 
-          pageController.jumpToPage(page);
-          return true;
-        },
-        child: tabController);
+  @override
+  Widget build(BuildContext context) {
+    bool isLogin = _appInfoState.state.loginAuth.isLogin;
+    if (isLogin) {
+      log.d("未登录用户");
+    }
+
+    log.d("main page build");
+
+    return NotificationListener<HomePageJumpPageNotification>(onNotification:
+        (notification) {
+      HomePageTab tab = notification.tab;
+      jumpPage(tab);
+      return true;
+    }, child:
+        ScopedModelDescendant<AppInfoState>(builder: (context, child, model) {
+      return _buildHomePage(context);
+    }));
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _pageController.dispose();
   }
 }

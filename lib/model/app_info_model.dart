@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
 import 'package:tom_and_jerry/config/app_config.dart';
 
@@ -25,7 +26,13 @@ class AppInfoModel {
   DateTime? installTime;
 
   /// 用户配置信息 仅当已授权后获取 loginAuth not null
-  UserProfile? userProfile;
+  UserProfile? _userProfile;
+
+  UserProfile get userProfile => _userProfile ?? UserProfile();
+
+  set userProfile(UserProfile userProfile) {
+    _userProfile = userProfile;
+  }
 
   /// 登录认证信息
   LoginAuth loginAuth = LoginAuth();
@@ -58,6 +65,9 @@ class UserProfile {
 
   /// 个人信息更新时间
   DateTime? updateTime;
+
+  @enumerated
+  ThemeMode themeMode = ThemeMode.system;
 }
 
 @embedded
@@ -79,5 +89,5 @@ class LoginAuth {
   DateTime? loginTime;
 
   /// 认证过期时间
-  DateTime? expreTime;
+  DateTime? expireTime;
 }

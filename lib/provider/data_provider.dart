@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
 abstract class DataProvider<T> {
-
   DataProvider({String? scope});
 
   String get scope;
@@ -16,8 +15,8 @@ abstract class DataProvider<T> {
     String dir = "$baseDir/global";
     Directory directory = Directory(dir);
     bool isExists = await directory.exists();
-    if(!isExists){
-      await directory.create(recursive:true);
+    if (!isExists) {
+      await directory.create(recursive: true);
     }
     return dir;
   }

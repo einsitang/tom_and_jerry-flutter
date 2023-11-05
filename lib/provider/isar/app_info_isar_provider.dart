@@ -25,9 +25,9 @@ class AppInfoIsarProvider extends DataProvider<Isar>
 
   @override
   Future<Isar> db() async {
-
     _isar = Isar.getInstance("global");
-    _isar ??= Isar.openSync([AppInfoModelSchema],name:"global", directory: await DataProvider.dir(scope: "global"));
+    _isar ??= Isar.openSync([AppInfoModelSchema],
+        name: "global", directory: await DataProvider.dir(scope: "global"));
 
     if (!_isar!.isOpen) {
       _isar!.close();
@@ -46,7 +46,6 @@ class AppInfoIsarProvider extends DataProvider<Isar>
     await isar.writeTxn(() async {
       await isar.appInfoModels.put(appInfo);
     });
-
   }
 
   @override

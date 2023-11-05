@@ -1,28 +1,51 @@
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:tom_and_jerry/page/im/chat_list_item.dart';
 
-import 'chat_list_item.dart';
+import 'package:tom_and_jerry/common/app_theme.dart';
 
 final Logger log = Logger();
 
-class ChatListPage extends StatefulWidget {
-  const ChatListPage({super.key});
+class ChatListWidget extends StatefulWidget {
+  const ChatListWidget({super.key});
 
   @override
-  State<ChatListPage> createState() => _ChatListPageState();
+  State<ChatListWidget> createState() => _ChatListWidgetState();
 }
 
-class _ChatListPageState extends State<ChatListPage> {
+class _ChatListWidgetState extends State<ChatListWidget> {
+  late ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+  }
+
   @override
   Widget build(BuildContext context) {
-    log.d("chat list page build .");
+
     Random random = Random();
-    return ListView(
-        padding: const EdgeInsets.only(top:8.0,bottom: 8.0,left: 5,right: 5),
-        children: List.generate(20,
-            (index) => ChatListItemPage(
-                chatId: "_$index", randomCode: random.nextInt(50))));
+
+    return ListView.builder(
+        controller: _scrollController,
+        padding:
+            const EdgeInsets.only(top: 8.0, bottom: 8.0, left: 5, right: 5),
+        itemCount: 20,
+        itemBuilder: (context, int position) {
+          return Theme(
+            data: AppTheme.of(context),
+            child: ChatListItemWidget(
+                chatId: "_$position", randomCode: random.nextInt(50)),
+          );
+        });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _scrollController.dispose();
   }
 }

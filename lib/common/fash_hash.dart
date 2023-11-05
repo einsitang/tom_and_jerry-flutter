@@ -1,6 +1,5 @@
-
 class Tool {
-  static fastHash(String string){
+  static fastHash(String string) {
     var hash = 0xcbf29ce484222325;
 
     var i = 0;

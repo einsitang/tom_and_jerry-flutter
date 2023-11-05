@@ -1,7 +1,6 @@
 import 'package:tom_and_jerry/model/gps_model.dart';
 
 abstract class GpsProvider {
-
   GpsProvider(String scope);
 
   String get scope;

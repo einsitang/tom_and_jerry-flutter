@@ -18,6 +18,6 @@ abstract class AppConfig {
   static const String aMapAndroidAppKey = _AppConfig.aMapAndroidAppKey;
 
   /// 应用版本,如果不定义则默认 1.0.0
-  @EnviedField(defaultValue : "1.0.0", varName: "APP_VERSION")
+  @EnviedField(defaultValue: "1.0.0", varName: "APP_VERSION")
   static const String version = _AppConfig.version;
 }

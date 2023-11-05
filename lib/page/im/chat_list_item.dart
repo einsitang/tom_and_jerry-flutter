@@ -3,30 +3,55 @@ import 'dart:math';
 import 'package:badges/badges.dart' as badges;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:common_utils/common_utils.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:tom_and_jerry/common/app_theme.dart';
+import 'package:tom_and_jerry/page/im/chat_session.dart';
+import 'package:tom_and_jerry/state/app_info_state.dart';
 
 final Logger log = Logger();
 
-class ChatListItemPage extends StatefulWidget {
-  const ChatListItemPage(
+class ChatListItemWidget extends StatefulWidget {
+  const ChatListItemWidget(
       {super.key, required this.chatId, required this.randomCode});
 
   final String chatId;
   final int randomCode;
 
   @override
-  State<StatefulWidget> createState() => _ChatListItemState();
+  State<StatefulWidget> createState() => _ChatListWidgetState();
 }
 
-class _ChatListItemState extends State<ChatListItemPage> {
-  Color _color = Colors.white;
+class _ChatListWidgetState extends State<ChatListItemWidget> {
+  /// 背景颜色
+  Color? _backgroundColor;
+
+  late final Color _hoverBackgroundColor;
+  late final Color _normalBackgroundColor;
+
+  AppInfoState get _appInfoState => ScopedModel.of<AppInfoState>(context);
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    ThemeData themeData = AppTheme.of(context);
+    _hoverBackgroundColor = themeData.hoverColor;
+    _normalBackgroundColor = themeData.scaffoldBackgroundColor;
+    _backgroundColor ??= _normalBackgroundColor;
+  }
 
   @override
   Widget build(BuildContext context) {
     // read chatId from widget
     // user chatService get chat detail
+
+    ThemeData themeData = AppTheme.of(context);
 
     int randUnReadCount = Random().nextInt(99);
     DateTime randomDateTime =
@@ -38,9 +63,10 @@ class _ChatListItemState extends State<ChatListItemPage> {
         "https://xsgames.co/randomusers/assets/avatars/pixel/${widget.randomCode}.jpg";
 
     // 默认 size 64 的 Icon 对象
-    icon64(IconData icon){
-      return Icon(icon,size:64);
+    icon64(IconData icon) {
+      return Icon(icon, size: 64);
     }
+
     /// 头像
     CircleAvatar chatAvatar = CircleAvatar(
         radius: 33,
@@ -71,7 +97,7 @@ class _ChatListItemState extends State<ChatListItemPage> {
       Container(
           width: 130,
           alignment: Alignment.topRight,
-          child: Text(briefDayFormat, style: const TextStyle(color: Colors.black54)))
+          child: Text(briefDayFormat, style: themeData.textTheme.bodySmall))
     ]);
 
     Widget chatDigest = Row(children: [
@@ -101,13 +127,13 @@ class _ChatListItemState extends State<ChatListItemPage> {
       SizedBox(height: 45, child: chatDigest)
     ]);
 
-    AnimatedContainer chatListItemWidget = AnimatedContainer(
+    Container chatListItemWidget = Container(
       margin: const EdgeInsets.only(top: 3, bottom: 3),
       padding: const EdgeInsets.only(left: 5, right: 5),
       height: 80,
       decoration: BoxDecoration(
-          color: _color,
-          // border: const Border(bottom: BorderSide(color: Colors.black12)),
+          //color: themeData.scaffoldBackgroundColor,
+          color: _backgroundColor,
           borderRadius: const BorderRadius.all(Radius.circular(5.0)),
           boxShadow: const [
             BoxShadow(
@@ -115,8 +141,6 @@ class _ChatListItemState extends State<ChatListItemPage> {
                 offset: Offset(1.0, 1.0),
                 blurRadius: 0.5)
           ]),
-      curve: Curves.linearToEaseOut,
-      duration: const Duration(milliseconds: 300),
       child: Row(children: [
         Container(
             width: 80, alignment: Alignment.centerLeft, child: chatAvatar),
@@ -127,10 +151,18 @@ class _ChatListItemState extends State<ChatListItemPage> {
       ]),
     );
 
-    return GestureDetector(
+    return InkWell(
         child: chatListItemWidget,
         onTap: () {
-          log.d("点击");
+          log.d("goto tap chat session page");
+          ThemeData themeData = AppTheme.of(context);
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+            var scopedModelWidget = ScopedModel<AppInfoState>(
+                model: _appInfoState,
+                child: ChatSessionPage(
+                    chatId: widget.chatId, appInfoState: _appInfoState));
+            return Theme(data: themeData, child: scopedModelWidget);
+          }));
         },
         onLongPress: () {
           log.d("长按 : ${widget.chatId}");
@@ -159,34 +191,13 @@ class _ChatListItemState extends State<ChatListItemPage> {
                 );
               });
         },
-        onLongPressMoveUpdate: (LongPressMoveUpdateDetails details) {
+        onHighlightChanged: (value) {
           setState(() {
-            _color = Colors.white;
-          });
-        },
-        onLongPressDown: (LongPressDownDetails details) {
-          setState(() {
-            _color = Colors.lightBlue.shade100;
-          });
-        },
-        onLongPressUp: () {
-          setState(() {
-            _color = Colors.white;
-          });
-        },
-        onLongPressStart: (LongPressStartDetails details) {
-          setState(() {
-            _color = Colors.white;
-          });
-        },
-        onLongPressEnd: (LongPressEndDetails details) {
-          setState(() {
-            _color = Colors.white;
-          });
-        },
-        onLongPressCancel: () {
-          setState(() {
-            _color = Colors.white;
+            if (value) {
+              _backgroundColor = _hoverBackgroundColor;
+            } else {
+              _backgroundColor = _normalBackgroundColor;
+            }
           });
         });
   }

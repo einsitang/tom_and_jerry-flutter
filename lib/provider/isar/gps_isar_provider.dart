@@ -8,7 +8,7 @@ class GpsIsarProvider extends DataProvider<Isar> implements GpsProvider {
 
   Isar? _isar;
 
-  GpsIsarProvider(this._scope) : super(scope:_scope);
+  GpsIsarProvider(this._scope) : super(scope: _scope);
 
   @override
   String get scope => _scope;
@@ -21,7 +21,8 @@ class GpsIsarProvider extends DataProvider<Isar> implements GpsProvider {
   @override
   Future<Isar> db() async {
     _isar = Isar.getInstance(_scope);
-    _isar ??= Isar.openSync([GpsModelSchema],name:_scope, directory: await DataProvider.dir(scope: _scope));
+    _isar ??= Isar.openSync([GpsModelSchema],
+        name: _scope, directory: await DataProvider.dir(scope: _scope));
 
     if (!_isar!.isOpen) {
       _isar!.close();
