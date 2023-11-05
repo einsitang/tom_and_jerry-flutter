@@ -2,6 +2,8 @@
 
 tom and jerry flutter app
 
+this is opensource flutter project just for fun's, not an official Disney app
+
 ## Depend
 
 - dart SDK: '>=2.18.6 <3.0.0' // Null-Safety
